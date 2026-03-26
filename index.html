@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Τεχνητή Νοημοσύνη — AI Seminar | Διεύθυνση Διοίκησης & Οικονομικών UCY 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --text: #e2e2e8;
+    --text-dim: #8888a0;
+    --accent: #7c6aef;
+    --accent-glow: #7c6aef44;
+    --accent2: #38bdf8;
+    --accent3: #f472b6;
+    --green: #34d399;
+    --orange: #fb923c;
+    --gradient: linear-gradient(135deg, #7c6aef, #38bdf8);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck { position: relative; width: 100%; height: 100%; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 6rem;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+    text-align: center;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  .slide.exit-right {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  h1.smaller { font-size: 2.4rem; }
+
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+
+  p, li {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  strong { color: var(--text); }
+
+  em.gr {
+    font-style: normal;
+    color: var(--accent3);
+    font-size: 0.95em;
+  }
+
+  ul {
+    list-style: none;
+    text-align: left;
+    max-width: 850px;
+  }
+
+  ul li {
+    padding: 0.5rem 0;
+    padding-left: 2rem;
+    position: relative;
+  }
+
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .subtitle {
+    font-size: 1.4rem;
+    color: var(--text-dim);
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+  }
+
+  .author {
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 1.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0.3rem;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .tag.highlight {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .tag.green { border-color: var(--green); color: var(--green); }
+  .tag.orange { border-color: var(--orange); color: var(--orange); }
+  .tag.pink { border-color: var(--accent3); color: var(--accent3); }
+
+  /* Comparison boxes */
+  .compare {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    max-width: 950px;
+    width: 100%;
+  }
+
+  .compare-box {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+    text-align: left;
+  }
+
+  .compare-box.glow {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  .compare-box h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: var(--text);
+  }
+
+  .compare-box.glow h4 { color: var(--accent); }
+
+  .compare-box p, .compare-box li { font-size: 1rem; }
+
+  /* Triple boxes */
+  .triple {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    max-width: 1050px;
+    width: 100%;
+  }
+
+  .triple .box {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: left;
+  }
+
+  .triple .box h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: var(--accent2);
+  }
+
+  .triple .box p { font-size: 0.95rem; }
+
+  /* Demo card */
+  .demo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 3rem;
+    max-width: 750px;
+    width: 100%;
+    text-align: left;
+    margin-top: 1rem;
+  }
+
+  .demo-card .prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--accent2);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.4rem;
+  }
+
+  .demo-card .prompt::before {
+    content: '> ';
+    color: var(--accent);
+  }
+
+  .big-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Steps */
+  .steps { counter-reset: step; text-align: left; max-width: 750px; }
+
+  .steps li {
+    counter-increment: step;
+    padding-left: 3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  /* Grid for tool cards */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+    max-width: 900px;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    text-align: left;
+  }
+
+  .tool-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .tool-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* Stat row */
+  .stat-row {
+    display: flex;
+    gap: 2.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat .number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat .label {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+  }
+
+  /* Section divider */
+  .section-divider h1 {
+    font-size: 4rem;
+  }
+
+  /* Table */
+  .slide table {
+    border-collapse: collapse;
+    max-width: 900px;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .slide table th,
+  .slide table td {
+    padding: 0.7rem 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 1rem;
+    color: var(--text-dim);
+  }
+
+  .slide table th {
+    color: var(--accent2);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .slide table td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: default;
+    box-shadow: none;
+    border-color: var(--border);
+  }
+
+  .progress { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-dim); }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gradient);
+    transition: width 0.5s ease;
+    z-index: 100;
+  }
+
+  .bg-glow {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-glow.one { background: var(--accent); top: -200px; right: -100px; }
+  .bg-glow.two { background: var(--accent2); bottom: -200px; left: -100px; }
+
+  .footer {
+    position: fixed;
+    bottom: 2rem;
+    right: 3rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0.5;
+    z-index: 100;
+  }
+
+  .footer span { color: var(--accent); }
+
+  /* Print-friendly */
+  @media print {
+    .slide { position: relative; opacity: 1; transform: none; pointer-events: auto; page-break-after: always; }
+    .nav, .progress-bar, .bg-glow, .footer { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow one"></div>
+<div class="bg-glow two"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ==================== SLIDE 1: TITLE ==================== -->
+  <div class="slide active">
+    <h3>Διεύθυνση Διοίκησης & Οικονομικών &middot; Πανεπιστήμιο Κύπρου</h3>
+    <h1>Τεχνητή Νοημοσύνη<br>Artificial Intelligence</h1>
+    <p class="subtitle">Σεμινάριο 3 ωρών &middot; 3-Hour Seminar</p>
+    <div class="author">Eric Georgiades</div>
+    <div style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-dim)">26 Μαρτίου 2026 &middot; March 26, 2026</div>
+  </div>
+
+  <!-- ==================== SLIDE 2: AGENDA ==================== -->
+  <div class="slide">
+    <h3>Ατζέντα &middot; Agenda</h3>
+    <h2>Τι θα καλύψουμε σήμερα</h2>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>Μέρος 1 &middot; Part 1 (~90')</h4>
+        <p>
+          Τι είναι η AI σήμερα<br>
+          AI στα πανεπιστήμια παγκοσμίως<br>
+          Εντυπωσιακά εργαλεία & demos<br>
+          EU AI Act & τι σημαίνει για εμάς<br>
+          <em class="gr">What is AI &middot; University use cases &middot; Amazing tools &middot; EU regulations</em>
+        </p>
+      </div>
+      <div class="compare-box glow">
+        <h4>Μέρος 2 &middot; Part 2 (~90')</h4>
+        <p>
+          Tips & tricks με LLMs<br>
+          Τεχνικές prompting<br>
+          Πρακτικά workflows<br>
+          Hands-on ασκήσεις<br>
+          <em class="gr">Prompting &middot; Workflows &middot; Hands-on practice</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 3: POLL ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x270B;</div>
+    <h3>Ας ξεκινήσουμε &middot; Let's Start</h3>
+    <h2>Σηκώστε το χέρι σας!</h2>
+    <ul>
+      <li>Ποιος έχει χρησιμοποιήσει <strong>ChatGPT</strong>; <em class="gr">Who has used ChatGPT?</em></li>
+      <li>Ποιος έχει χρησιμοποιήσει <strong>Gemini</strong> ή <strong>Copilot</strong>;</li>
+      <li>Ποιος χρησιμοποιεί AI <strong>καθημερινά</strong> στη δουλειά του; <em class="gr">Daily at work?</em></li>
+      <li>Ποιος <strong>ανησυχεί</strong> για την AI; <em class="gr">Who is worried about AI?</em></li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 4: WHAT IS AI ==================== -->
+  <div class="slide">
+    <h3>Βασικές Έννοιες &middot; Key Concepts</h3>
+    <h2>Τι είναι η Τεχνητή Νοημοσύνη;</h2>
+    <div class="triple">
+      <div class="box">
+        <h4>AI / Τεχνητή Νοημοσύνη</h4>
+        <p>Το ευρύ πεδίο &mdash; μηχανές που εκτελούν "έξυπνες" εργασίες.<br><em class="gr">The broad field of intelligent machines</em></p>
+      </div>
+      <div class="box">
+        <h4>Machine Learning</h4>
+        <p>Συστήματα που μαθαίνουν μοτίβα από δεδομένα, χωρίς ρητό προγραμματισμό.<br><em class="gr">Systems that learn from data</em></p>
+      </div>
+      <div class="box">
+        <h4>LLMs / Generative AI</h4>
+        <p>Μοντέλα που <strong>δημιουργούν</strong> κείμενο, εικόνες, κώδικα, βίντεο.<br><em class="gr">Models that create new content</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 5: AI IN 2026 ==================== -->
+  <div class="slide">
+    <h3>Το Τοπίο Σήμερα &middot; The Landscape</h3>
+    <h2>AI το 2026: Τι άλλαξε;</h2>
+    <ul>
+      <li>Τα μοντέλα <strong>σκέφτονται βαθύτερα</strong> &mdash; reasoning, planning, multi-step tasks</li>
+      <li>Η AI <strong>δεν μιλάει μόνο</strong> &mdash; τώρα <strong style="color:var(--accent)">ενεργεί</strong> (agents) <em class="gr">AI now takes actions</em></li>
+      <li><strong>1 εκατομμύριο tokens</strong> context &mdash; διαβάζει ολόκληρα βιβλία ταυτόχρονα</li>
+      <li>Βίντεο, μουσική, 3D &mdash; όλα δημιουργούνται από AI</li>
+      <li>Κόστος εκπαίδευσης μειώθηκε <strong>90%+</strong> (DeepSeek)</li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 6: THE BIG MODELS ==================== -->
+  <div class="slide">
+    <h3>Τα Μεγάλα Μοντέλα &middot; The Big Models</h3>
+    <h2>Ποιος είναι ποιος το 2026</h2>
+    <table>
+      <tr><th>Model</th><th>Company</th><th>Strength</th></tr>
+      <tr><td>ChatGPT (GPT-4o / GPT-5)</td><td>OpenAI</td><td>All-rounder, μεγαλύτερο οικοσύστημα</td></tr>
+      <tr><td>Claude (Opus 4.6)</td><td>Anthropic</td><td>Εξαιρετικό γράψιμο, 1M context</td></tr>
+      <tr><td>Gemini (3.1 Pro)</td><td>Google</td><td>Deep thinking, Google integration</td></tr>
+      <tr><td>Copilot</td><td>Microsoft</td><td>Ενσωματωμένο σε Office 365</td></tr>
+      <tr><td>DeepSeek V3.2</td><td>DeepSeek</td><td>Open-source, εξαιρετικά φθηνό</td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== SLIDE 7: STRENGTHS & LIMITS ==================== -->
+  <div class="slide">
+    <h3>Τι κάνει καλά & τι όχι</h3>
+    <h2>Δυνατότητες & Περιορισμοί</h2>
+    <div class="compare">
+      <div class="compare-box" style="border-color: var(--green);">
+        <h4 style="color: var(--green);">Δυνατά Σημεία</h4>
+        <p>
+          Γρήγορη σύνταξη & επαναδιατύπωση<br>
+          Περιλήψεις μεγάλων κειμένων<br>
+          Brainstorming & ιδέες<br>
+          Μετάφραση & πολυγλωσσία<br>
+          Ανάλυση δεδομένων & κώδικα
+        </p>
+      </div>
+      <div class="compare-box" style="border-color: var(--accent3);">
+        <h4 style="color: var(--accent3);">Περιορισμοί</h4>
+        <p>
+          "Hallucinations" &mdash; σίγουρες αλλά λάθος απαντήσεις<br>
+          Δεν αντικαθιστά ανθρώπινη κρίση<br>
+          Bias από δεδομένα εκπαίδευσης<br>
+          Προσοχή με προσωπικά δεδομένα<br>
+          Δεν ξέρει τι δεν ξέρει
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 8: SECTION - UNIVERSITIES ==================== -->
+  <div class="slide section-divider">
+    <h3>Μέρος 1.2</h3>
+    <h1>AI στα Πανεπιστήμια<br>Παγκοσμίως</h1>
+    <p class="subtitle">Real examples from around the world</p>
+  </div>
+
+  <!-- ==================== SLIDE 9: UNI USE CASES ==================== -->
+  <div class="slide">
+    <h3>Παγκόσμια Παραδείγματα &middot; Global Examples</h3>
+    <h2>Πανεπιστήμια που χρησιμοποιούν AI</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>California State University</h4>
+        <p>ChatGPT Edu σε <strong>460,000+ φοιτητές</strong> &mdash; η μεγαλύτερη ανάπτυξη AI σε πανεπιστήμιο παγκοσμίως</p>
+      </div>
+      <div class="tool-card">
+        <h4>Arizona State University</h4>
+        <p>Πρώτο πανεπιστήμιο με <strong>agentic AI</strong> πλατφόρμα (Grammarly) στη διδασκαλία</p>
+      </div>
+      <div class="tool-card">
+        <h4>University of West Florida</h4>
+        <p>AI Student Recruiter &mdash; <strong>+32% αύξηση</strong> στο ποσοστό εισδοχής</p>
+      </div>
+      <div class="tool-card">
+        <h4>Πανεπιστήμια Κίνας</h4>
+        <p>Νέα μαθήματα βασισμένα στο <strong>DeepSeek</strong> &mdash; AI, ethics, programming</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 10: HOW CAN UCY BENEFIT ==================== -->
+  <div class="slide">
+    <h3>Διεύθυνση Διοίκησης & Οικονομικών</h3>
+    <h2>Πώς μπορεί να ωφεληθεί η υπηρεσία μας;</h2>
+    <div class="triple">
+      <div class="box">
+        <h4>Επικοινωνία</h4>
+        <p>Σύνταξη emails & ανακοινώσεων<br>Μετάφραση εγγράφων<br>Απαντήσεις σε FAQs<br><em class="gr">Emails, announcements, translations</em></p>
+      </div>
+      <div class="box">
+        <h4>Οικονομικά & Αναφορές</h4>
+        <p>Ανάλυση δεδομένων & Excel<br>Περιλήψεις εκθέσεων<br>Σύνταξη reports & budgets<br><em class="gr">Data analysis, reports, budgets</em></p>
+      </div>
+      <div class="box">
+        <h4>Διαδικασίες</h4>
+        <p>Checklists & workflows<br>Πρακτικά συνεδριάσεων<br>Πολιτικές & κανονισμοί<br><em class="gr">Processes, minutes, policies</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 11: SECTION - AMAZING TOOLS ==================== -->
+  <div class="slide section-divider">
+    <h3>Μέρος 1.3</h3>
+    <h1>Εντυπωσιακά Εργαλεία<br>& Demos</h1>
+    <p class="subtitle">Prepare to be amazed</p>
+  </div>
+
+  <!-- ==================== SLIDE 12: AI VIDEO ==================== -->
+  <div class="slide">
+    <h3>AI Βίντεο &middot; AI Video</h3>
+    <h2>Από κείμενο σε βίντεο</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>Google Veo 3</h4>
+        <p>4K βίντεο με <strong>ήχο, διάλογο & lip-sync</strong>. Viral τον Μάιο 2025 &mdash; τόσο ρεαλιστικό που δεν ξεχωρίζεις.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Runway</h4>
+        <p>Εργαλείο για filmmakers. Text-to-video, image-to-video, editing toolbox.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Kling O3</h4>
+        <p>Multishot &mdash; πολλαπλές γωνίες κάμερας σε ένα βίντεο.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Sora (OpenAI)</h4>
+        <p>Ξεκίνησε & <strong>κλείνει τον Μάρτιο 2026</strong>. Δείχνει πόσο γρήγορα κινείται ο χώρος!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 13: AI IMAGE ==================== -->
+  <div class="slide">
+    <h3>AI Εικόνες &middot; AI Images</h3>
+    <h2>Δημιουργία εικόνων με AI</h2>
+    <div class="triple">
+      <div class="box">
+        <h4>DALL-E 3 (ChatGPT)</h4>
+        <p>Πιο εύκολο στη χρήση. Ενσωματωμένο στο ChatGPT. Εξαιρετικό για γρήγορα visuals.</p>
+      </div>
+      <div class="box">
+        <h4>Midjourney v6</h4>
+        <p>Καλύτερη καλλιτεχνική ποιότητα. Ιδανικό για design & branding.</p>
+      </div>
+      <div class="box">
+        <h4>Ideogram 3.0</h4>
+        <p><strong>Κείμενο μέσα σε εικόνες!</strong> Posters, logos, infographics &mdash; χωρίς Photoshop.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 14: AI MUSIC ==================== -->
+  <div class="slide">
+    <h3>AI Μουσική &middot; AI Music</h3>
+    <h2>Δημιουργία μουσικής με AI</h2>
+    <div class="compare">
+      <div class="compare-box glow">
+        <h4>Suno v5</h4>
+        <p>Γράψε ένα prompt, πάρε ολόκληρο τραγούδι σε <strong>60 δευτερόλεπτα</strong>.<br><br>Το Suno Studio είναι το πρώτο AI-native DAW (Digital Audio Workstation).</p>
+      </div>
+      <div class="compare-box">
+        <h4>Udio</h4>
+        <p>Υψηλότερη ποιότητα ήχου. Κατέβασε stems για remixing.<br><br>Ιδανικό για μουσικούς που θέλουν AI ως εργαλείο.</p>
+      </div>
+    </div>
+    <p style="margin-top:1.5rem; font-size:1.1rem;">
+      <em class="gr">Demo: Let's create a song together!</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 15: NOTEBOOKLM ==================== -->
+  <div class="slide">
+    <h3>Για Όλους &middot; For Everyone</h3>
+    <h2>Google NotebookLM</h2>
+    <ul>
+      <li>Ανέβασε <strong>50 πηγές</strong> (PDFs, Docs, YouTube, websites)</li>
+      <li>Ρώτα ερωτήσεις &mdash; οι απαντήσεις βασίζονται <strong>μόνο</strong> στις πηγές σου</li>
+      <li><strong>Audio Overviews</strong>: Μετατρέπει έγγραφα σε podcast (80+ γλώσσες)</li>
+      <li><strong>Video Overviews</strong>: Δημιουργεί βίντεο-παρουσιάσεις από τα έγγραφά σου</li>
+      <li><strong>Infographics & Slides</strong>: Visualization πηγαίου υλικού</li>
+      <li>Ιδανικό για σύνθεση εγγράφων, αναφορές & ανάλυση κανονισμών</li>
+    </ul>
+    <p style="margin-top:1rem;"><span class="tag green">Δωρεάν &middot; Free</span> <span class="tag highlight">notebooklm.google</span></p>
+  </div>
+
+  <!-- ==================== SLIDE 16: SEARCH & ANALYSIS TOOLS ==================== -->
+  <div class="slide">
+    <h3>Αναζήτηση & Ανάλυση &middot; Search & Analysis</h3>
+    <h2>AI που ψάχνει και αναλύει για εσάς</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>Perplexity AI</h4>
+        <p>Αναζήτηση + AI με <strong>inline πηγές</strong>. Ιδανικό για γρήγορη έρευνα κανονισμών, νομοθεσίας, best practices.</p>
+      </div>
+      <div class="tool-card">
+        <h4>ChatGPT Deep Research</h4>
+        <p>Ψάχνει το web αυτόνομα, συγκεντρώνει πηγές, και γράφει <strong>ολοκληρωμένη αναφορά</strong>.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Google NotebookLM</h4>
+        <p>Ανέβασε εσωτερικά έγγραφα και κάνε ερωτήσεις &mdash; <strong>χωρίς hallucinations</strong>.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Claude (Projects)</h4>
+        <p>Ανέβασε κανονισμούς/πολιτικές και ρώτα: "Τι ισχύει για...;" &mdash; <strong>σαν νομικός σύμβουλος</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 17: ADMIN & FINANCE TOOLS ==================== -->
+  <div class="slide">
+    <h3>Εργαλεία Διοίκησης &middot; Admin Tools</h3>
+    <h2>AI για διοικητικό προσωπικό</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>Gamma</h4>
+        <p>AI presentations. Γράψε ένα θέμα, πάρε <strong>ολόκληρη παρουσίαση</strong> σε δευτερόλεπτα.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Canva</h4>
+        <p>AI-assisted design. Slides, posters, ανακοινώσεις, infographics. Εύκολο χωρίς design skills.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Otter.ai / Fireflies</h4>
+        <p>Καταγραφή & <strong>αυτόματη μεταγραφή</strong> συνεδριάσεων. Περίληψη + action items.</p>
+      </div>
+      <div class="tool-card">
+        <h4>Zapier / Make</h4>
+        <p>Αυτοματοποίηση χωρίς κώδικα: email &rarr; spreadsheet &rarr; notification. <strong>No-code workflows.</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 18: PRODUCTIVITY ==================== -->
+  <div class="slide">
+    <h3>Παραγωγικότητα &middot; Productivity</h3>
+    <h2>AI στην καθημερινότητα</h2>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>Microsoft 365 Copilot</h4>
+        <p>
+          <strong>Word:</strong> Σύνταξη & αναδιατύπωση<br>
+          <strong>PowerPoint:</strong> Slides από text<br>
+          <strong>Excel:</strong> Ανάλυση δεδομένων<br>
+          <strong>Outlook:</strong> Περιλήψεις threads<br>
+          <strong>Teams:</strong> Meeting summaries<br>
+          <em class="gr">Wave 3: "Copilot Coworker" &mdash; agentic tasks</em>
+        </p>
+      </div>
+      <div class="compare-box glow">
+        <h4>Google Gemini in Workspace</h4>
+        <p>
+          <strong>Docs:</strong> Drafts από context σου<br>
+          <strong>Sheets:</strong> Δομές από prompt<br>
+          <strong>Slides:</strong> Layouts & diagrams<br>
+          <strong>Drive:</strong> "Ask Gemini" σε όλα τα αρχεία<br>
+          <em class="gr">"Fill with Gemini" auto-populates tables</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 19: EU AI ACT ==================== -->
+  <div class="slide">
+    <h3>Νομοθεσία &middot; Regulation</h3>
+    <h2>EU AI Act &mdash; Τι ισχύει τώρα;</h2>
+    <table>
+      <tr><th>Ημερομηνία</th><th>Τι ισχύει</th></tr>
+      <tr><td>Αύγ. 2024</td><td>AI Act τέθηκε σε ισχύ</td></tr>
+      <tr><td style="color:var(--accent)">Φεβ. 2025</td><td><strong>Απαγορευμένες πρακτικές</strong> + <strong>AI Literacy υποχρέωση</strong> (Άρθρο 4)</td></tr>
+      <tr><td>Αύγ. 2025</td><td>Κανόνες για General Purpose AI models</td></tr>
+      <tr><td style="color:var(--orange)">Αύγ. 2026</td><td><strong>High-risk AI rules</strong> &mdash; HR, εκπαίδευση, δημόσιες υπηρεσίες</td></tr>
+    </table>
+    <p style="margin-top:1.5rem; max-width:800px; font-size:1.1rem;">
+      <strong style="color:var(--orange)">Σημαντικό:</strong> Το Άρθρο 4 (AI Literacy) <strong>ήδη ισχύει</strong> &mdash; τα πανεπιστήμια πρέπει να εκπαιδεύουν το προσωπικό τους. <em class="gr">This seminar is not optional &mdash; it's compliance.</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 20: AI ACT - WHAT TO DO ==================== -->
+  <div class="slide">
+    <h3>Πρακτικές Συμβουλές &middot; Practical Advice</h3>
+    <h2>Τι σημαίνει για εμάς στο UCY;</h2>
+    <ul>
+      <li><strong>AI Literacy:</strong> Υποχρέωση εκπαίδευσης προσωπικού (ήδη ισχύει!)</li>
+      <li><strong>Απαγορεύεται:</strong> Social scoring, χειραγώγηση, real-time biometric ID</li>
+      <li><strong>High-risk (από Αύγ. 2026):</strong> AI σε HR, προσλήψεις, αξιολογήσεις &rarr; human oversight υποχρεωτικό</li>
+      <li><strong>GDPR:</strong> Μην βάζετε προσωπικά δεδομένα υπαλλήλων/φοιτητών σε AI tools</li>
+      <li><strong>Διαφάνεια:</strong> Ενημερώστε συναδέλφους & προϊσταμένους για σημαντική χρήση AI</li>
+      <li><strong>Εσωτερικές πολιτικές:</strong> Προτείνετε σαφείς κατευθυντήριες γραμμές για τη Διεύθυνση</li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 21: BREAK ==================== -->
+  <div class="slide section-divider">
+    <div class="big-icon">&#x2615;</div>
+    <h1>Διάλειμμα<br>Break</h1>
+    <p class="subtitle" style="margin-top:1rem;">10 λεπτά &middot; 10 minutes</p>
+    <p style="margin-top:2rem; font-size:1.1rem; color:var(--text-dim)">
+      Συζητήστε μεταξύ σας: Τι χρησιμοποιείτε ήδη; Τι σας ανησυχεί;<br>
+      <em class="gr">Chat with each other: What do you already use? What worries you?</em>
+    </p>
+  </div>
+
+  <!-- ==================== PART 2 ==================== -->
+
+  <!-- ==================== SLIDE 22: PART 2 TITLE ==================== -->
+  <div class="slide section-divider">
+    <h3>Μέρος 2</h3>
+    <h1>Tips & Tricks<br>με LLMs</h1>
+    <p class="subtitle">Πώς να αξιοποιήσετε στο μέγιστο την AI</p>
+  </div>
+
+  <!-- ==================== SLIDE 23: THE #1 RULE ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x1F3AF;</div>
+    <h3>Ο Χρυσός Κανόνας &middot; The Golden Rule</h3>
+    <h1 class="smaller">Η ποιότητα του prompt<br>= η ποιότητα της απάντησης</h1>
+    <p style="max-width:700px; margin-top:1.5rem;">
+      Garbage in, garbage out. Αν δώσεις αόριστη ερώτηση, θα πάρεις αόριστη απάντηση.<br>
+      <em class="gr">Your prompt quality determines the output quality.</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 24: PROMPT STRUCTURE ==================== -->
+  <div class="slide">
+    <h3>Δομή Prompt &middot; Prompt Structure</h3>
+    <h2>Τα 4 στοιχεία ενός καλού prompt</h2>
+    <div class="tool-grid">
+      <div class="tool-card" style="border-color: var(--accent);">
+        <h4>1. Ρόλος &middot; Role</h4>
+        <p>"You are an experienced university administrator..."<br><em class="gr">Δώσε ρόλο στην AI</em></p>
+      </div>
+      <div class="tool-card" style="border-color: var(--accent2);">
+        <h4>2. Πλαίσιο &middot; Context</h4>
+        <p>"I work at the finance directorate of a public university in Cyprus..."<br><em class="gr">Give background information</em></p>
+      </div>
+      <div class="tool-card" style="border-color: var(--green);">
+        <h4>3. Εργασία &middot; Task</h4>
+        <p>"Draft a memo to department heads about the new procurement policy..."<br><em class="gr">Be specific about what you want</em></p>
+      </div>
+      <div class="tool-card" style="border-color: var(--accent3);">
+        <h4>4. Μορφή &middot; Format</h4>
+        <p>"In formal tone, bullet points, max 300 words, in Greek..."<br><em class="gr">Specify the output format</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 25: EXAMPLE BAD vs GOOD ==================== -->
+  <div class="slide">
+    <h3>Παράδειγμα &middot; Example</h3>
+    <h2>Κακό vs Καλό Prompt</h2>
+    <div class="compare">
+      <div class="compare-box" style="border-color: var(--accent3);">
+        <h4 style="color: var(--accent3);">Κακό Prompt</h4>
+        <div class="prompt" style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--accent3); margin-top:0.5rem;">
+          "Γράψε μου ένα email"
+        </div>
+        <p style="margin-top:0.8rem; font-size:0.95rem;">Αόριστο. Δεν ξέρει σε ποιον, για τι, τι ύφος, τι γλώσσα, τι μήκος.</p>
+      </div>
+      <div class="compare-box" style="border-color: var(--green);">
+        <h4 style="color: var(--green);">Καλό Prompt</h4>
+        <div class="prompt" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--green); margin-top:0.5rem;">
+          "You are a university administrator. Draft a polite but firm reminder email to department heads about the deadline for submitting budget proposals. Tone: professional, concise. Max 200 words. Include a clear call to action with the deadline date of April 15."
+        </div>
+        <p style="margin-top:0.8rem; font-size:0.95rem;">Ρόλος + Πλαίσιο + Εργασία + Μορφή = Εξαιρετικό αποτέλεσμα.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 26: TECHNIQUES ==================== -->
+  <div class="slide">
+    <h3>Τεχνικές &middot; Techniques</h3>
+    <h2>Pro Tips για καλύτερα αποτελέσματα</h2>
+    <ul>
+      <li><strong>Iterative refinement:</strong> Μην περιμένεις τέλειο αποτέλεσμα &mdash; ζήτα αλλαγές <em class="gr">"Make it shorter" "Add examples"</em></li>
+      <li><strong>Chain of thought:</strong> "Σκέψου βήμα-βήμα" &mdash; βελτιώνει πολύπλοκα tasks <em class="gr">"Think step by step"</em></li>
+      <li><strong>Few-shot examples:</strong> Δώσε 1-2 παραδείγματα του τι θέλεις <em class="gr">Show, don't just tell</em></li>
+      <li><strong>Constraints:</strong> "Μέγιστο 200 λέξεις" / "Χρησιμοποίησε bullet points" <em class="gr">Set boundaries</em></li>
+      <li><strong>Persona swap:</strong> "Εξήγησε σε 10χρονο" vs "Εξήγησε σε PhD φοιτητή" <em class="gr">Adjust audience</em></li>
+      <li><strong>Ζήτα κριτική:</strong> "Τι λάθη μπορεί να έχει αυτό;" <em class="gr">"What might be wrong with this?"</em></li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 27: ERIC'S PRO TIPS ==================== -->
+  <div class="slide">
+    <h3>Pro Tips &middot; Από την Εμπειρία μου</h3>
+    <h2>3 πράγματα που κάνουν τεράστια διαφορά</h2>
+    <div class="triple">
+      <div class="box" style="border-color: var(--accent);">
+        <h4 style="color: var(--accent);">1. Κρατήστε τη γλώσσα στοχευμένη</h4>
+        <p>Μην γράφετε στα ελληνικά περιμένοντας ελληνικό output. <strong>Χτίστε το prompt στα αγγλικά</strong> (η AI δουλεύει καλύτερα), και μετά σε <strong>νέο chat</strong> μεταφράστε το αποτέλεσμα &mdash; ή ζητήστε να σας φτιάξει prompt για μετάφραση.<br><em class="gr">Build in English, translate separately</em></p>
+      </div>
+      <div class="box" style="border-color: var(--accent2);">
+        <h4 style="color: var(--accent2);">2. Ένα θέμα ανά chat</h4>
+        <p>Αν αλλάξετε θέμα στο ίδιο chat, η ποιότητα <strong>πέφτει δραματικά</strong>. Ξεκινήστε <strong>νέα συνομιλία</strong> για κάθε ξεχωριστό task. Κάθε chat = ένα project.<br><em class="gr">Diverging topics = worse outputs</em></p>
+      </div>
+      <div class="box" style="border-color: var(--green);">
+        <h4 style="color: var(--green);">3. Λιγότερα tokens = καλύτερα</h4>
+        <p>Η AI έχει <strong>περιορισμένο "παράθυρο"</strong> μνήμης (context window). Αν γεμίσει με άχρηστο κείμενο, χάνει focus. Κρατήστε τα prompts σας <strong>συνοπτικά & ουσιαστικά</strong>.<br><em class="gr">Token efficiency = output quality</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 28: PRACTICAL WORKFLOWS ==================== -->
+  <div class="slide">
+    <h3>Πρακτικά Workflows</h3>
+    <h2>6 workflows που μπορείτε να χρησιμοποιήσετε αύριο</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>1. Email Rewriter</h4>
+        <p>Paste ένα messy email &rarr; "Κάνε το σαφές, φιλικό, επαγγελματικό, στα ελληνικά"</p>
+      </div>
+      <div class="tool-card">
+        <h4>2. Meeting Summarizer</h4>
+        <p>Paste πρακτικά συνεδρίασης &rarr; "Περίληψη σε 5 bullet points + action items"</p>
+      </div>
+      <div class="tool-card">
+        <h4>3. Policy Drafter</h4>
+        <p>"Γράψε draft πολιτικής για [θέμα], σε επίσημο ύφος, με ενότητες και bullet points"</p>
+      </div>
+      <div class="tool-card">
+        <h4>4. Budget Analyzer</h4>
+        <p>Upload Excel/CSV &rarr; "Ανάλυσε τα βασικά trends, εντόπισε ανωμαλίες, φτιάξε summary"</p>
+      </div>
+      <div class="tool-card">
+        <h4>5. Translation + Adaptation</h4>
+        <p>"Μετάφρασε αυτό το επίσημο έγγραφο στα αγγλικά, διατηρώντας τη νομική ορολογία"</p>
+      </div>
+      <div class="tool-card">
+        <h4>6. Checklist Builder</h4>
+        <p>"Φτιάξε checklist για [διαδικασία], βήμα-βήμα, με deadlines και υπεύθυνους"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 28: LIVE DEMO ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x1F3AC;</div>
+    <h3>Live Demo</h3>
+    <h2>Ας δοκιμάσουμε μαζί!</h2>
+    <p style="max-width:700px; margin-bottom:1.5rem;">Θα δείξω πώς μπορείτε να χρησιμοποιήσετε AI σε πραγματικά σενάρια διοίκησης.</p>
+    <div class="demo-card">
+      <div class="prompt">Draft a reminder to dept heads about budget deadline, formal but friendly</div>
+      <div class="prompt">Πάρε αυτά τα πρακτικά και κάνε περίληψη + action items</div>
+      <div class="prompt">Φτιάξε checklist για τη διαδικασία πρόσληψης νέου υπαλλήλου</div>
+      <div class="prompt">Ανέβασε αυτό το Excel και εξήγησε τα κύρια trends στις δαπάνες</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 29: AGENTIC AI ==================== -->
+  <div class="slide">
+    <h3>Η Νέα Εποχή &middot; The New Era</h3>
+    <h2>Non-Agentic vs Agentic AI</h2>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>Non-Agentic AI (μέχρι τώρα)</h4>
+        <p>Ρωτάς, απαντάει.<br>Ένα βήμα τη φορά.<br>Εσύ είσαι ο οδηγός.</p>
+        <div style="margin-top:1rem">
+          <span class="tag">ChatGPT chat</span>
+          <span class="tag">Gemini</span>
+        </div>
+      </div>
+      <div class="compare-box glow">
+        <h4>Agentic AI (2025-2026)</h4>
+        <p>Δίνεις στόχο, σχεδιάζει, χρησιμοποιεί εργαλεία, και <strong>ενεργεί</strong> αυτόνομα.</p>
+        <div style="margin-top:1rem">
+          <span class="tag highlight">ChatGPT Agent</span>
+          <span class="tag highlight">Claude Code</span>
+          <span class="tag highlight">Manus AI</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:1.5rem; font-size:1.15rem;">
+      <em class="gr">From "says things" to "does things"</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 30: AGENT EXAMPLES ==================== -->
+  <div class="slide">
+    <h3>Παραδείγματα Agents</h3>
+    <h2>Τι μπορεί να κάνει ένα AI Agent;</h2>
+    <ul>
+      <li><strong>ChatGPT Agent Mode:</strong> Ψάχνει στο web, κάνει κλικ, πληκτρολογεί &mdash; ολοκληρωμένες εργασίες</li>
+      <li><strong>Manus AI:</strong> Αυτόνομη έρευνα, ανάλυση δεδομένων, δημιουργία website &mdash; viral το 2025, εξαγοράστηκε από Meta ($2B)</li>
+      <li><strong>Zapier Agents:</strong> Περιέγραψε workflow σε απλά αγγλικά &rarr; αυτοματοποιεί σύνδεση apps</li>
+      <li><strong>Claude Code:</strong> Δημιουργεί κώδικα, τρέχει commands, διαχειρίζεται projects <em class="gr">(φτιάχτηκε αυτή η παρουσίαση!)</em></li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 31: WORKPLACE AI POLICY ==================== -->
+  <div class="slide">
+    <h3>AI στην Εργασία &middot; AI at Work</h3>
+    <h2>Πότε και πώς χρησιμοποιούμε AI;</h2>
+    <div class="triple">
+      <div class="box">
+        <h4 style="color: var(--green);">Ελεύθερα</h4>
+        <p>Brainstorming ιδεών<br>Σύνταξη drafts<br>Μετάφραση κειμένων<br>Ανάλυση δημόσιων δεδομένων</p>
+      </div>
+      <div class="box">
+        <h4 style="color: var(--orange);">Με Προσοχή</h4>
+        <p>Επίσημα έγγραφα (πάντα review)<br>Οικονομικά στοιχεία (verify!)<br>Εξωτερική επικοινωνία</p>
+      </div>
+      <div class="box">
+        <h4 style="color: var(--accent3);">Αποφύγετε</h4>
+        <p>Προσωπικά δεδομένα υπαλλήλων<br>Εμπιστευτικά οικονομικά<br>Νομικές αποφάσεις χωρίς έλεγχο</p>
+      </div>
+    </div>
+    <p style="margin-top:1.5rem; max-width:800px; font-size:1.05rem;">
+      <strong>Κανόνας:</strong> Η AI φτιάχνει το draft &mdash; <strong>εσείς</strong> παίρνετε την απόφαση και κάνετε τον τελικό έλεγχο.
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 32: SAFETY TIPS ==================== -->
+  <div class="slide">
+    <h3>Ασφάλεια &middot; Safety</h3>
+    <h2>Τι να προσέχετε</h2>
+    <ul>
+      <li><strong>Μην εμπιστεύεστε τυφλά:</strong> Πάντα ελέγχετε facts, αριθμούς, citations</li>
+      <li><strong>Προσωπικά δεδομένα:</strong> Μην βάζετε ονόματα υπαλλήλων, μισθούς, ευαίσθητα στοιχεία</li>
+      <li><strong>Copyright:</strong> AI output μπορεί να περιέχει copyrighted υλικό</li>
+      <li><strong>Bias:</strong> Τα μοντέλα κληρονομούν bias &mdash; ελέγχετε για ισορροπία</li>
+      <li><strong>Διαφάνεια:</strong> Να αναφέρετε σημαντική χρήση AI στους συναδέλφους & προϊσταμένους</li>
+      <li><strong>Data retention:</strong> Ελέγξτε τις ρυθμίσεις &mdash; opt-out από training αν χρειάζεται</li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 33: HANDS-ON ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x1F4BB;</div>
+    <h3>Hands-On &middot; Πρακτική Άσκηση</h3>
+    <h2>Η σειρά σας!</h2>
+    <p style="max-width:700px; margin-bottom:1.5rem;">Σε μικρές ομάδες, διαλέξτε ένα σενάριο και γράψτε ένα prompt:</p>
+    <div class="tool-grid">
+      <div class="tool-card" style="border-color: var(--accent);">
+        <h4>Σενάριο A</h4>
+        <p>Γράψτε email υπενθύμισης στα τμήματα για υποβολή προϋπολογισμού</p>
+      </div>
+      <div class="tool-card" style="border-color: var(--accent2);">
+        <h4>Σενάριο B</h4>
+        <p>Φτιάξτε περίληψη πρακτικών συνεδρίασης (θα δώσω sample text)</p>
+      </div>
+      <div class="tool-card" style="border-color: var(--green);">
+        <h4>Σενάριο C</h4>
+        <p>Δημιουργήστε checklist για τη διαδικασία onboarding νέου υπαλλήλου</p>
+      </div>
+      <div class="tool-card" style="border-color: var(--accent3);">
+        <h4>Σενάριο D</h4>
+        <p>Μεταφράστε ένα ελληνικό έγγραφο πολιτικής στα αγγλικά, επίσημο ύφος</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 34: DISCUSSION ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x1F4AC;</div>
+    <h3>Συζήτηση &middot; Discussion</h3>
+    <h2>Πού βάζετε τα όρια;</h2>
+    <ul>
+      <li>Μόνο brainstorming & drafting;</li>
+      <li>Editing & γλωσσική βελτίωση;</li>
+      <li>Πλήρως generated έγγραφα;</li>
+      <li>Σε ποιες διαδικασίες θα εμπιστευόσασταν AI output;</li>
+    </ul>
+    <p style="margin-top:2rem; max-width:700px; font-size:1.1rem;">
+      <strong>Πρόταση:</strong> Ξεκινήστε με internal χρήση (drafts, summaries) πριν χρησιμοποιήσετε AI σε εξωτερικά έγγραφα.<br>
+      <em class="gr">Start internal, then expand to external-facing work.</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 35: CHEAT SHEET ==================== -->
+  <div class="slide">
+    <h3>Cheat Sheet</h3>
+    <h2>Σύνοψη Εργαλείων</h2>
+    <div class="triple">
+      <div class="box">
+        <h4>General Use</h4>
+        <p>
+          <span class="tag highlight">ChatGPT</span>
+          <span class="tag highlight">Claude</span>
+          <span class="tag highlight">Gemini</span>
+          <span class="tag highlight">Copilot</span>
+          <span class="tag highlight">Perplexity</span>
+        </p>
+      </div>
+      <div class="box">
+        <h4>Admin & Productivity</h4>
+        <p>
+          <span class="tag green">NotebookLM</span>
+          <span class="tag green">Gamma</span>
+          <span class="tag green">Otter.ai</span>
+          <span class="tag green">Zapier</span>
+          <span class="tag green">Canva</span>
+        </p>
+      </div>
+      <div class="box">
+        <h4>Creative</h4>
+        <p>
+          <span class="tag pink">Midjourney</span>
+          <span class="tag pink">DALL-E 3</span>
+          <span class="tag pink">Suno</span>
+          <span class="tag pink">Veo 3</span>
+          <span class="tag pink">Canva</span>
+          <span class="tag pink">Gamma</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 36: KEY TAKEAWAYS ==================== -->
+  <div class="slide">
+    <h3>Βασικά Συμπεράσματα &middot; Key Takeaways</h3>
+    <h2>Τι να θυμάστε</h2>
+    <ul>
+      <li>Η AI είναι <strong>ήδη</strong> μέρος της ανώτατης εκπαίδευσης &mdash; για εμάς και τους φοιτητές</li>
+      <li>Στόχος: <strong>ενημερωμένη, υπεύθυνη χρήση</strong> &mdash; όχι αποφυγή ούτε τυφλή υιοθέτηση</li>
+      <li>AI Literacy είναι <strong>νομική υποχρέωση</strong> (EU AI Act, Φεβ. 2025)</li>
+      <li>Η AI <strong>δεν αντικαθιστά</strong> &mdash; <strong>ενδυναμώνει</strong></li>
+      <li>Ξεκινήστε μικρά: <strong>ένα εργαλείο</strong> αυτή τη βδομάδα</li>
+    </ul>
+  </div>
+
+  <!-- ==================== SLIDE 37: CALL TO ACTION ==================== -->
+  <div class="slide">
+    <div class="big-icon">&#x1F680;</div>
+    <h3>Πρόκληση &middot; Challenge</h3>
+    <h1 class="smaller">Δοκιμάστε ένα νέο AI workflow<br>αυτή τη βδομάδα</h1>
+    <p style="max-width:700px; margin-top:1.5rem; font-size:1.15rem;">
+      ...και μιλήστε με έναν συνάδελφο ή φοιτητή για αυτό που μάθατε.<br>
+      <em class="gr">Try one new AI workflow this week and share what you learned.</em>
+    </p>
+  </div>
+
+  <!-- ==================== SLIDE 38: RESOURCES ==================== -->
+  <div class="slide">
+    <h3>Πόροι &middot; Resources</h3>
+    <h2>Links & Εργαλεία</h2>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h4>ChatGPT</h4>
+        <p>chat.openai.com</p>
+      </div>
+      <div class="tool-card">
+        <h4>Claude</h4>
+        <p>claude.ai</p>
+      </div>
+      <div class="tool-card">
+        <h4>Gemini</h4>
+        <p>gemini.google.com</p>
+      </div>
+      <div class="tool-card">
+        <h4>Perplexity</h4>
+        <p>perplexity.ai</p>
+      </div>
+      <div class="tool-card">
+        <h4>NotebookLM</h4>
+        <p>notebooklm.google</p>
+      </div>
+      <div class="tool-card">
+        <h4>Gamma (Presentations)</h4>
+        <p>gamma.app</p>
+      </div>
+      <div class="tool-card">
+        <h4>Suno (Music)</h4>
+        <p>suno.com</p>
+      </div>
+      <div class="tool-card">
+        <h4>Canva for Education</h4>
+        <p>canva.com/education</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 39: THANK YOU ==================== -->
+  <div class="slide">
+    <h3>Ευχαριστώ &middot; Thank You</h3>
+    <h1>Το μέλλον ανήκει<br>σε αυτούς που μαθαίνουν<br>να συνεργάζονται με AI.</h1>
+    <div class="author" style="margin-top:2rem;">Eric Georgiades</div>
+    <div style="margin-top:1rem; font-size:0.95rem; color:var(--text-dim);">
+      <span class="tag">linkedin.com/in/ericosg</span>
+    </div>
+    <div style="margin-top:2rem;">
+      <span class="tag" style="font-size:0.9rem">Ερωτήσεις; &middot; Questions?</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prevBtn" onclick="navigate(-1)" disabled>&#8592;</button>
+  <span class="progress" id="counter">1 / 40</span>
+  <button id="nextBtn" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<div class="footer">UCY &middot; Διεύθυνση Διοίκησης & Οικονομικών &middot; <span>March 2026</span></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressBar = document.getElementById('progressBar');
+  let current = 0;
+
+  function navigate(dir) {
+    const next = current + dir;
+    if (next < 0 || next >= slides.length) return;
+
+    const prev = current;
+    slides[prev].classList.remove('active');
+    slides[prev].classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+
+    current = next;
+    slides[current].style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+    slides[current].offsetHeight; // force reflow
+    slides[current].style.transform = '';
+    slides[current].classList.add('active');
+
+    setTimeout(() => {
+      slides[prev].classList.remove('exit-left', 'exit-right');
+    }, 500);
+
+    counter.textContent = `${current + 1} / ${slides.length}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
+  });
+</script>
+
+</body>
+</html>
